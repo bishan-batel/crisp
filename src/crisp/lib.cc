@@ -1,7 +1,11 @@
-#include "lib.h"
+#include "lib.hpp"
 
+#include <fmt/format.h>
 
 namespace crisp {
 
-void test() {}
-} // namespace crisp
+  void test() {
+    fmt::println("Hello World");
+  }
+
+}

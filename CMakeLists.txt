@@ -21,7 +21,11 @@ if (${FORCE_COLORED_OUTPUT})
 endif ()
 
 # Dependencies
-find_package(crab REQUIRED)
-find_package(fmt REQUIRED)
+
+option(CPM_USE_LOCAL_PACKAGES "Should CPM look for local packages?" OFF)
+
+include(cmake/CPM.cmake)
+
+CPMAddPackage("gh:bishan-batel/crab@2.3.0")
 
 add_subdirectory(src)

@@ -1,3 +1,5 @@
-#include <crisp/lib.h>
+#include <crisp/lib.hpp>
 
-i32 main() { crisp::test(); }
+i32 main() {
+  crisp::test();
+}
