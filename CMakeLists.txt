@@ -27,6 +27,6 @@ option(CPM_USE_LOCAL_PACKAGES "Should CPM look for local packages?" OFF)
 include(cmake/CPM.cmake)
 
 # CPMAddPackage("gh:bishan-batel/crab@2.3.0")
-CPMAddPackage("gh:bishan-batel/crab#preamble")
+CPMAddPackage("gh:bishan-batel/crab#main")
 
 add_subdirectory(src)

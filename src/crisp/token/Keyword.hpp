@@ -7,7 +7,7 @@
 
 namespace crisp::tok {
 
-  class Keyword final : IToken {
+  class Keyword final : public IToken {
 
   public:
 

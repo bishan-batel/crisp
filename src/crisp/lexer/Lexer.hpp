@@ -1,58 +1,39 @@
 #pragma once
 
 #include <crab/collections/Vec.hpp>
+#include <crab/mem/forward.hpp>
+#include <crab/num/range.hpp>
 #include <crab/rc/Rc.hpp>
 #include <crab/result/Result.hpp>
 #include <crab/result/forward.hpp>
 #include "crisp/token/IToken.hpp"
 #include "crisp/token/Spanned.hpp"
+#include "Error.hpp"
 
 namespace crisp::lexer {
   using tok::IToken;
 
   using TokenList = Vec<Rc<IToken>>;
 
-  class Error final {
-  public:
-
-    enum class Type {
-      UnknownCharacter
-    };
-
-    explicit Error(Type type, SrcSpan span);
-
-    [[nodiscard]] auto get_type() const -> Type;
-
-    [[nodiscard]] auto get_span() const -> const SrcSpan&;
-
-    [[nodiscard]] auto what() const -> String;
-
-  private:
-
-    Type type;
-    SrcSpan span;
-  };
-
-  [[nodiscard]] inline auto error_reason(const Error& err) -> String {
-    return err.what();
-  }
-
-  template<typename... Args>
-  [[nodiscard]] CRAB_INLINE auto make_err(Args&&... args) -> crab::Err<Error> {
-    return crab::Err<Error>(Error(crab::forward<Args>(args)...));
-  };
-
-  template<typename T>
-  using Result = crab::result::Result<T, Error>;
-
   class Lexer final {
   public:
 
-    explicit Lexer(StringView source);
+    explicit Lexer(StringView source, Option<String> source_file = {});
 
+    /// Consumes self and attempts to fully tokenize input
     [[nodiscard]] auto tokenize() && -> Result<TokenList>;
 
   private:
+
+    /// Emplaces a new token to the token list
+    template<typename T, typename... Args>
+    auto emplace(Args&&... args) -> void {
+      tokens.push_back(crab::make_rc<T>(crab::forward<Args>(args)...));
+    }
+
+    [[nodiscard]] auto span(usize length = 1) const -> SrcSpan;
+
+    [[nodiscard]] auto span(crab::Range<> range) const -> SrcSpan;
 
     [[nodiscard]] auto skip_whitespace() -> bool;
 
@@ -68,8 +49,11 @@ namespace crisp::lexer {
 
     StringView source;
     TokenList tokens;
+    Option<String> file;
     usize index = 0;
   };
+
+  [[nodiscard]] auto is_identifier_char(char c) -> bool;
 
   [[nodiscard]] auto is_whitespace(char c) -> bool;
 }

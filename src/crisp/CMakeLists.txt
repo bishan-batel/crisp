@@ -1,7 +1,10 @@
 add_library(crisp
 	./lib.cc
 	./token/Keyword.cc
+	./token/Identifier.cc
 	./lexer/Lexer.cc
+	./lexer/Error.cc
+	./token/Spanned.cc
 )
 target_link_libraries(crisp PUBLIC crab fmt)
 

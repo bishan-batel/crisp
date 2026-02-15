@@ -15,4 +15,6 @@ namespace crisp {
     Range<> range;
     Option<String> source_file{};
   };
+
+  [[nodiscard]] auto format_as(const SrcSpan& span) -> String;
 }

@@ -1,28 +1,17 @@
 #include "Lexer.hpp"
+#include <crab/assertion/todo.hpp>
 #include <crab/num/range.hpp>
+#include <crab/rc/Rc.hpp>
 #include <crab/result/Ok.hpp>
 #include <crab/opt/boolean_constructs.hpp>
 #include <utility>
+#include "crisp/token/Identifier.hpp"
 #include "crisp/token/Keyword.hpp"
 #include "crisp/token/Spanned.hpp"
 
 namespace crisp::lexer {
 
-  Error::Error(Type type, SrcSpan span): type{type}, span{crab::move(span)} {}
-
-  [[nodiscard]] auto Error::get_type() const -> Type {
-    return type;
-  }
-
-  [[nodiscard]] auto Error::get_span() const -> const SrcSpan& {
-    return span;
-  }
-
-  [[nodiscard]] auto Error::what() const -> String {
-    switch (type) {
-      case Type::UnknownCharacter: return "String";
-    }
-  }
+  Lexer::Lexer(StringView source, Option<String> source_file): source{source}, file{crab::move(source_file)} {}
 
   [[nodiscard]] auto Lexer::tokenize() && -> Result<TokenList> {
     tokens.clear();
@@ -33,13 +22,17 @@ namespace crisp::lexer {
 
     while (not_finished()) {
 
+      if (skip_whitespace()) {
+        continue;
+      }
+
       if (scan_keyword()) {
         continue;
       }
 
       return Error{
         Error::Type::UnknownCharacter,
-        SrcSpan{crab::range(index, index + 1)},
+        span(),
       };
     }
 
@@ -62,14 +55,35 @@ namespace crisp::lexer {
   }
 
   [[nodiscard]] auto Lexer::scan_keyword() -> bool {
-    const StringView substr = source.substr(index);
-
-    for (const auto& [key, word]: tok::Keyword::STRING_TO_WORD) {
-      if (substr.starts_with(key)) {
-        continue;
-      }
+    if (not current().is_some_and(&is_identifier_char)) {
+      return false;
     }
-    return false;
+
+    usize start = index;
+
+    while (current().is_some_and(&is_identifier_char)) {
+      advance();
+    }
+
+    usize end = index;
+
+    StringView identifier{source.substr(start, end - start)};
+
+    if (identifier.empty()) {
+      return false;
+    }
+
+    SrcSpan identifier_span = span(crab::range(start, end));
+
+    fmt::println("'{}'", identifier);
+
+    if (tok::Keyword::STRING_TO_WORD.contains(identifier)) {
+      emplace<tok::Keyword>(tok::Keyword::STRING_TO_WORD.at(identifier), crab::move(identifier_span));
+    } else {
+      emplace<tok::Identifier>(String{identifier}, crab::move(identifier_span));
+    }
+
+    return true;
   }
 
   auto Lexer::advance(usize i) -> void {
@@ -92,6 +106,16 @@ namespace crisp::lexer {
     return c;
   }
 
+  [[nodiscard]] auto Lexer::span(usize length) const -> SrcSpan {
+    auto start = std::min(index, source.length() - 1);
+    auto end = std::min(index + length, source.length() - 1);
+    return span(crab::range(start, end));
+  }
+
+  [[nodiscard]] auto Lexer::span(crab::Range<> range) const -> SrcSpan {
+    return SrcSpan{range, file};
+  }
+
   auto is_whitespace(const char c) -> bool {
     switch (c) {
       case '\t':
@@ -102,5 +126,27 @@ namespace crisp::lexer {
     }
   }
 
-  Lexer::Lexer(StringView source): source{source} {}
+  auto is_identifier_char(char c) -> bool {
+    if (c >= 'a' and c <= 'z') {
+      return true;
+    }
+
+    if (c >= 'A' and c <= 'Z') {
+      return true;
+    }
+
+    if (c >= '0' and c <= '9') {
+      return true;
+    }
+
+    if (c == '_') {
+      return true;
+    }
+
+    if (c == '$') {
+      return true;
+    }
+
+    return false;
+  }
 }
