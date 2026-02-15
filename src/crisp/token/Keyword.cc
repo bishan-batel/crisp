@@ -1,5 +1,7 @@
 #include "Keyword.hpp"
 #include <crab/core/unreachable.hpp>
+#include <crab/preamble.hpp>
+#include <crab/mem/move.hpp>
 
 namespace crisp::tok {
 
@@ -14,5 +16,5 @@ namespace crisp::tok {
     crab::unreachable();
   }
 
-  Keyword::Keyword(Word word): word{word} {}
+  Keyword::Keyword(Word word, SrcSpan span): IToken{crab::move(span)}, word{word} {}
 }

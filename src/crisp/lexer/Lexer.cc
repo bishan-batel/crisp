@@ -3,6 +3,7 @@
 #include <crab/result/Ok.hpp>
 #include <crab/opt/boolean_constructs.hpp>
 #include <utility>
+#include "crisp/token/Keyword.hpp"
 #include "crisp/token/Spanned.hpp"
 
 namespace crisp::lexer {
@@ -23,7 +24,7 @@ namespace crisp::lexer {
     }
   }
 
-  [[nodiscard]] auto Lexer::tokenize() && -> Result<Vec<Rc<IToken>>> {
+  [[nodiscard]] auto Lexer::tokenize() && -> Result<TokenList> {
     tokens.clear();
 
     if (source.empty()) {
@@ -49,7 +50,25 @@ namespace crisp::lexer {
     return index < source.length();
   }
 
+  [[nodiscard]] auto Lexer::skip_whitespace() -> bool {
+    bool scanned = false;
+
+    while (current().is_some_and(&is_whitespace)) {
+      scanned = true;
+      advance();
+    }
+
+    return scanned;
+  }
+
   [[nodiscard]] auto Lexer::scan_keyword() -> bool {
+    const StringView substr = source.substr(index);
+
+    for (const auto& [key, word]: tok::Keyword::STRING_TO_WORD) {
+      if (substr.starts_with(key)) {
+        continue;
+      }
+    }
     return false;
   }
 
@@ -73,4 +92,15 @@ namespace crisp::lexer {
     return c;
   }
 
+  auto is_whitespace(const char c) -> bool {
+    switch (c) {
+      case '\t':
+      case '\n':
+      case '\r':
+      case ' ': return true;
+      default: return false;
+    }
+  }
+
+  Lexer::Lexer(StringView source): source{source} {}
 }

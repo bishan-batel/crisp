@@ -10,9 +10,9 @@
 namespace crisp::lexer {
   using tok::IToken;
 
-  using TokenList = Vec<Rc<Spanned<IToken>>>;
+  using TokenList = Vec<Rc<IToken>>;
 
-  class Error final : crab::IError {
+  class Error final {
   public:
 
     enum class Type {
@@ -25,13 +25,17 @@ namespace crisp::lexer {
 
     [[nodiscard]] auto get_span() const -> const SrcSpan&;
 
-    [[nodiscard]] auto what() const -> String override;
+    [[nodiscard]] auto what() const -> String;
 
   private:
 
     Type type;
     SrcSpan span;
   };
+
+  [[nodiscard]] inline auto error_reason(const Error& err) -> String {
+    return err.what();
+  }
 
   template<typename... Args>
   [[nodiscard]] CRAB_INLINE auto make_err(Args&&... args) -> crab::Err<Error> {
@@ -42,12 +46,15 @@ namespace crisp::lexer {
   using Result = crab::result::Result<T, Error>;
 
   class Lexer final {
+  public:
 
     explicit Lexer(StringView source);
 
-    [[nodiscard]] auto tokenize() && -> Result<Vec<Rc<IToken>>>;
+    [[nodiscard]] auto tokenize() && -> Result<TokenList>;
 
   private:
+
+    [[nodiscard]] auto skip_whitespace() -> bool;
 
     [[nodiscard]] auto scan_keyword() -> bool;
 
@@ -60,7 +67,9 @@ namespace crisp::lexer {
     [[nodiscard]] auto not_finished() const -> bool;
 
     StringView source;
-    Vec<Rc<IToken>> tokens;
+    TokenList tokens;
     usize index = 0;
   };
+
+  [[nodiscard]] auto is_whitespace(char c) -> bool;
 }

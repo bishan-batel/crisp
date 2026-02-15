@@ -15,14 +15,4 @@ namespace crisp {
     Range<> range;
     Option<String> source_file{};
   };
-
-  template<typename T>
-  struct Spanned final {
-    static_assert(crab::ty::non_const<T>);
-
-    T value;
-    SrcSpan span;
-
-    Spanned(T&& value, SrcSpan span): value{crab::move(value)}, span{crab::move(span)} {}
-  };
 }

@@ -4,13 +4,14 @@
 #include <typeinfo>
 
 #include <crab/ref/is_exact.hpp>
+#include "crisp/token/Spanned.hpp"
 
 namespace crisp::tok {
   class IToken {
 
   public:
 
-    IToken() = default;
+    inline explicit IToken(SrcSpan span): span{crab::move(span)} {}
 
     IToken(const IToken&) = delete;
 
@@ -23,5 +24,13 @@ namespace crisp::tok {
     virtual ~IToken() = default;
 
     [[nodiscard]] virtual auto to_string() const -> String = 0;
+
+    [[nodiscard]] inline auto get_span() const -> SrcSpan {
+      return span;
+    }
+
+  private:
+
+    SrcSpan span;
   };
 }
