@@ -1,7 +1,8 @@
 
 
 file(GLOB_RECURSE crisp_sources CONFIGURE_DEPENDS "./*.cc")
-add_library(crisp
+
+add_library(crisp STATIC
 	${crisp_sources}
 	# ./lib.cc
 	# ./token/Keyword.cc
@@ -10,7 +11,7 @@ add_library(crisp
 	# ./lexer/Error.cc
 	# ./token/Spanned.cc
 )
-target_link_libraries(crisp PUBLIC crab fmt)
+target_link_libraries(crisp PUBLIC crab::crab fmt)
 
 target_include_directories(crisp PUBLIC 
 	${PROJECT_SOURCE_DIR}/src

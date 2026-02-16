@@ -22,11 +22,19 @@ endif ()
 
 # Dependencies
 
-option(CPM_USE_LOCAL_PACKAGES "Should CPM look for local packages?" OFF)
+option(CPM_USE_LOCAL_PACKAGES "Should CPM look for local packages?" ON)
 
 include(cmake/CPM.cmake)
 
-# CPMAddPackage("gh:bishan-batel/crab@2.3.0")
-CPMAddPackage("gh:bishan-batel/crab#main")
+CPMAddPackage(
+        NAME fmt
+        GITHUB_REPOSITORY "fmtlib/fmt"
+        GIT_TAG "12.1.0"
+        VERSION_MIN "9.0.0"
+)
+
+# find_package(fmt CONFIG REQUIRED)
+# find_package(crab CONFIG REQUIRED)
+CPMAddPackage("gh:bishan-batel/crab@2.3.1")
 
 add_subdirectory(src)

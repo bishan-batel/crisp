@@ -8,16 +8,28 @@
     crab.url = "github:bishan-batel/crab";
   };
 
-  outputs = { 
-    self, nixpkgs, flake-utils, crab, ...
-    }: flake-utils.lib.eachDefaultSystem (system: let
-      pkgs = nixpkgs.legacyPackages.${system};
-      crabPkgs = crab.packages.${system};
-      libPath = [ crabPkgs.default pkgs.fmt ]; 
-    in {
+  outputs =
+    {
+      self,
+      nixpkgs,
+      flake-utils,
+      crab,
+      ...
+    }:
+    flake-utils.lib.eachDefaultSystem (
+      system:
+      let
+        pkgs = nixpkgs.legacyPackages.${system};
+        crabPkgs = crab.packages.${system};
+        libPath = [
+          crabPkgs.default
+          pkgs.fmt
+        ];
+      in
+      {
 
-      devShells = { 
-        default = pkgs.mkShell {
+        devShells = {
+          default = pkgs.mkShell {
             name = "na-engine";
             packages = with pkgs; [
               ninja
@@ -25,14 +37,18 @@
               cmake
               unzip
               doxygen
-              llvmPackages.clang-tools 
+              llvmPackages.clang-tools
             ];
 
-            buildInputs = [ pkgs.pkg-config ];
-            nativeBuildInputs = [] ++ libPath;
+            buildInputs = [
+              pkgs.pkg-config
+              crabPkgs.default
+            ];
+            nativeBuildInputs = [ ] ++ libPath;
 
             LD_LIBRARY_PATH = pkgs.lib.makeLibraryPath libPath;
           };
-      };
-    });
+        };
+      }
+    );
 }
