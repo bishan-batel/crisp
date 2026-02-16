@@ -4,7 +4,7 @@
 #include <typeinfo>
 
 #include <crab/ref/is_exact.hpp>
-#include "crisp/token/Spanned.hpp"
+#include "crisp/span/Spanned.hpp"
 
 namespace crisp::tok {
   class IToken {

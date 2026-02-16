@@ -7,7 +7,7 @@
 #include <crab/result/Result.hpp>
 #include <crab/result/forward.hpp>
 #include "crisp/token/IToken.hpp"
-#include "crisp/token/Spanned.hpp"
+#include "crisp/span/Spanned.hpp"
 #include "Error.hpp"
 
 namespace crisp::lexer {

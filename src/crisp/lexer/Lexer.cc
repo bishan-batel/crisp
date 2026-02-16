@@ -7,7 +7,6 @@
 #include <utility>
 #include "crisp/token/Identifier.hpp"
 #include "crisp/token/Keyword.hpp"
-#include "crisp/token/Spanned.hpp"
 
 namespace crisp::lexer {
 
@@ -73,9 +72,7 @@ namespace crisp::lexer {
       return false;
     }
 
-    SrcSpan identifier_span = span(crab::range(start, end));
-
-    fmt::println("'{}'", identifier);
+    SrcSpan identifier_span{span(crab::range(start, end))};
 
     if (tok::Keyword::STRING_TO_WORD.contains(identifier)) {
       emplace<tok::Keyword>(tok::Keyword::STRING_TO_WORD.at(identifier), crab::move(identifier_span));

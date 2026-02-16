@@ -3,7 +3,6 @@
 #include <crab/preamble.hpp>
 
 #include "crisp/token/IToken.hpp"
-#include "crisp/token/Spanned.hpp"
 
 namespace crisp::tok {
 

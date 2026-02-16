@@ -3,7 +3,7 @@
 #include <crab/result/Err.hpp>
 #include <crab/result/Result.hpp>
 #include <crab/str/str.hpp>
-#include "crisp/token/Spanned.hpp"
+#include "crisp/span/Spanned.hpp"
 
 namespace crisp::lexer {
 
